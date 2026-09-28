@@ -7,7 +7,6 @@ app = Flask(__name__)
 # -----------------------------
 # Funciones de la aplicación
 # -----------------------------
-
 def sumar(a, b):
     return a + b
 
@@ -25,7 +24,6 @@ def dividir(a, b):
         raise ValueError("No se puede dividir entre cero")
 
     return a / b
-
 
 # -----------------------------
 # Rutas
