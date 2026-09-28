@@ -26,11 +26,11 @@ jobs:
 
       - name: Ejecutar pruebas unitarias
         run: |
-          pytest
+          pytest | tee pytest-resultados.txt
 
       - name: Calcular cobertura
         run: |
-          pytest --cov=app --cov-report=term-missing
+          pytest --cov=app --cov-report=term-missing | tee cobertura.txt
 
       - name: Construir imagen Docker
         run: |
@@ -39,3 +39,44 @@ jobs:
       - name: Mostrar imagen creada
         run: |
           docker images
+
+      - name: Generar Summary
+        if: always()
+        run: |
+          echo "# 🐳 CI Docker y Pruebas" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          echo "## ✅ Resultados del workflow" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Proceso | Estado |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| Descargar repositorio | ✅ Completado |" >> $GITHUB_STEP_SUMMARY
+          echo "| Configurar Python | ✅ Completado |" >> $GITHUB_STEP_SUMMARY
+          echo "| Instalar dependencias | ✅ Completado |" >> $GITHUB_STEP_SUMMARY
+          echo "| Pruebas unitarias | ✅ Ejecutadas |" >> $GITHUB_STEP_SUMMARY
+          echo "| Cobertura | ✅ Calculada |" >> $GITHUB_STEP_SUMMARY
+          echo "| Imagen Docker | ✅ Construida |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          echo "## 🧪 Pruebas unitarias" >> $GITHUB_STEP_SUMMARY
+          echo '```text' >> $GITHUB_STEP_SUMMARY
+          if [ -f pytest-resultados.txt ]; then
+            cat pytest-resultados.txt >> $GITHUB_STEP_SUMMARY
+          else
+            echo "No se generaron resultados." >> $GITHUB_STEP_SUMMARY
+          fi
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+          echo "## 📊 Cobertura de código" >> $GITHUB_STEP_SUMMARY
+          echo '```text' >> $GITHUB_STEP_SUMMARY
+          if [ -f cobertura.txt ]; then
+            cat cobertura.txt >> $GITHUB_STEP_SUMMARY
+          else
+            echo "No se generó información de cobertura." >> $GITHUB_STEP_SUMMARY
+          fi
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+          echo "## 🐳 Imagen Docker" >> $GITHUB_STEP_SUMMARY
+          echo '```text' >> $GITHUB_STEP_SUMMARY
+          docker images docker-actividad >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
